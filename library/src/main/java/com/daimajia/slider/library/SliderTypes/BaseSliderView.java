@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.daimajia.slider.library.R;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -45,6 +48,8 @@ public abstract class BaseSliderView {
 
     private ImageLoadListener mLoadListener;
 
+    private ImageLoader mImageLoader;
+
     private String mDescription;
 
     /**
@@ -56,7 +61,8 @@ public abstract class BaseSliderView {
         CenterCrop, CenterInside, Fit, FitCenterCrop
     }
 
-    protected BaseSliderView(Context context) {
+    protected BaseSliderView(Context context,ImageLoader imageLoader) {
+        mImageLoader = imageLoader;
         mContext = context;
         this.mBundle = new Bundle();
     }
@@ -177,7 +183,7 @@ public abstract class BaseSliderView {
      * @param v the whole view
      * @param targetImageView where to place image
      */
-    protected void bindEventAndShow(final View v, ImageView targetImageView){
+    protected void bindEventAndShow(final View v, final NetworkImageView targetImageView){
         final BaseSliderView me = this;
 
         v.setOnClickListener(new View.OnClickListener() {
@@ -194,7 +200,7 @@ public abstract class BaseSliderView {
 
         mLoadListener.onStart(me);
 
-        Picasso p = Picasso.with(mContext);
+        /*Picasso p = Picasso.with(mContext);
         RequestCreator rq = null;
         if(mUrl!=null){
             rq = p.load(mUrl);
@@ -245,6 +251,26 @@ public abstract class BaseSliderView {
                 }
                 if(v.findViewById(R.id.loading_bar) != null){
                     v.findViewById(R.id.loading_bar).setVisibility(View.INVISIBLE);
+                }
+            }
+        });*/
+        mImageLoader.get(mUrl, new ImageLoader.ImageListener() {
+
+            public void onErrorResponse(VolleyError error) {
+                if(mLoadListener != null){
+                    mLoadListener.onEnd(false,me);
+                }
+                if(v.findViewById(R.id.loading_bar) != null){
+                    v.findViewById(R.id.loading_bar).setVisibility(View.INVISIBLE);
+                } // set an error image if the download fails
+            }
+
+            public void onResponse(ImageLoader.ImageContainer response, boolean arg1) {
+                if(v.findViewById(R.id.loading_bar) != null){
+                    v.findViewById(R.id.loading_bar).setVisibility(View.INVISIBLE);
+                }
+                if (response.getBitmap() != null) {
+                    targetImageView.setImageBitmap(response.getBitmap());
                 }
             }
         });

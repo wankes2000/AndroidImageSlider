@@ -12,7 +12,7 @@ android {
     }
     buildTypes {
         release {
-            runProguard false
+
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
@@ -26,6 +26,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:20.+'
     compile "com.android.support:support-v4:20.0.+"
     compile 'com.squareup.picasso:picasso:+'
+    compile 'com.mcxiaoke.volley:library:+'
     compile 'com.nineoldandroids:library:+'
 }
 apply from: './gradle-mvn-push.gradle'
